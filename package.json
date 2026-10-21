@@ -2,9 +2,10 @@
   "name": "tpglobo-back-end",
   "version": "1.0.0",
   "description": "Back-End da aplicação voltada ao desenvolvimento de um teleprompter automático para Residência Tecnológica 2026.2",
-  "main": "index.js",
+  "main": "src/server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "start": "node src/server.js",
+  "dev": "node --watch src/server.js"
   },
   "repository": {
     "type": "git",
