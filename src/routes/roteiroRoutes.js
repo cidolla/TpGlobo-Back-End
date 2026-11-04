@@ -1,9 +1,11 @@
+
 const express = require('express');
 
 const {
   criarRoteiro,
   listarRoteiros,
-  buscarRoteiroPorId
+  buscarRoteiroPorId,
+  atualizarRoteiro
 } = require('../controllers/roteiroController');
 
 const {
@@ -12,6 +14,7 @@ const {
 } = require('../middlewares/authMiddleware');
 
 const router = express.Router();
+
 
 /**
  * @swagger
@@ -73,12 +76,14 @@ const router = express.Router();
  *       500:
  *         description: Erro interno do servidor.
  */
+
 router.post(
   '/',
   autenticar,
   autorizarPerfis('admin', 'editor'),
   criarRoteiro
 );
+
 
 /**
  * @swagger
@@ -142,6 +147,74 @@ router.get(
   autenticar,
   autorizarPerfis('admin', 'editor', 'operador'),
   buscarRoteiroPorId
+);
+
+
+/**
+ * @swagger
+ * /api/roteiros/{id}:
+ *   patch:
+ *     summary: Atualizar parcialmente um roteiro
+ *     description: Permite modificar título, categoria ou blocos de um roteiro existente.
+ *     tags: [Roteiros]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: 6ae3e2bb620fc9a9addaae81
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               titulo:
+ *                 type: string
+ *                 example: Jornal da Noite - Edição Especial
+ *               categoria:
+ *                 type: string
+ *                 enum: [politica, economia, esportes, saude, educacao, seguranca, cultura, tecnologia, previsao-do-tempo, outros]
+ *                 example: economia
+ *               blocos:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     ordem:
+ *                       type: integer
+ *                       example: 1
+ *                     texto:
+ *                       type: string
+ *                       example: Boa noite. Esta é uma edição especial.
+ *                     tipo:
+ *                       type: string
+ *                       enum: [fala, vinheta, pausa, orientacao]
+ *                       example: fala
+ *     responses:
+ *       200:
+ *         description: Roteiro atualizado com sucesso.
+ *       400:
+ *         description: ID ou dados inválidos, ou campos não permitidos.
+ *       401:
+ *         description: Token não informado ou inválido.
+ *       403:
+ *         description: Perfil sem permissão para atualizar roteiros.
+ *       404:
+ *         description: Roteiro não encontrado.
+ *       500:
+ *         description: Erro interno do servidor.
+ */
+
+router.patch(
+  '/:id',
+  autenticar,
+  autorizarPerfis('admin', 'editor'),
+  atualizarRoteiro
 );
 
 module.exports = router;
