@@ -114,11 +114,6 @@ Principais atributos:
 | perfil | Nível de acesso do usuário |
 | ativo | Indica se o usuário está habilitado |
 
-Perfis disponíveis:
-
-- `admin` — administrador do sistema.
-- `editor` — responsável pela criação e edição de roteiros.
-- `operador` — usuário com permissão de consulta dos roteiros.
 
 ### Roteiro
 
