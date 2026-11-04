@@ -5,7 +5,8 @@ const {
   criarRoteiro,
   listarRoteiros,
   buscarRoteiroPorId,
-  atualizarRoteiro
+  atualizarRoteiro,
+  arquivarRoteiro
 } = require('../controllers/roteiroController');
 
 const {
@@ -22,6 +23,7 @@ const router = express.Router();
  *   - name: Roteiros
  *     description: Gerenciamento dos roteiros do teleprompter
  */
+
 
 /**
  * @swagger
@@ -89,7 +91,7 @@ router.post(
  * @swagger
  * /api/roteiros:
  *   get:
- *     summary: Listar todos os roteiros
+ *     summary: Listar roteiros não arquivados
  *     tags: [Roteiros]
  *     security:
  *       - bearerAuth: []
@@ -155,7 +157,7 @@ router.get(
  * /api/roteiros/{id}:
  *   patch:
  *     summary: Atualizar parcialmente um roteiro
- *     description: Permite modificar título, categoria ou blocos de um roteiro existente.
+ *     description: Permite modificar o título, a categoria ou os blocos de um roteiro existente.
  *     tags: [Roteiros]
  *     security:
  *       - bearerAuth: []
@@ -215,6 +217,46 @@ router.patch(
   autenticar,
   autorizarPerfis('admin', 'editor'),
   atualizarRoteiro
+);
+
+/**
+ * @swagger
+ * /api/roteiros/{id}:
+ *   delete:
+ *     summary: Arquivar um roteiro
+ *     description: Realiza o arquivamento lógico do roteiro, preservando seu histórico no banco de dados.
+ *     tags: [Roteiros]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         example: 6ae3e2bb620fc9a9addaae81
+ *     responses:
+ *       200:
+ *         description: Roteiro arquivado com sucesso.
+ *       400:
+ *         description: ID inválido.
+ *       401:
+ *         description: Token não informado ou inválido.
+ *       403:
+ *         description: Perfil sem permissão para arquivar roteiros.
+ *       404:
+ *         description: Roteiro não encontrado.
+ *       409:
+ *         description: Roteiro já arquivado.
+ *       500:
+ *         description: Erro interno do servidor.
+ */
+
+router.delete(
+  '/:id',
+  autenticar,
+  autorizarPerfis('admin', 'editor'),
+  arquivarRoteiro
 );
 
 module.exports = router;

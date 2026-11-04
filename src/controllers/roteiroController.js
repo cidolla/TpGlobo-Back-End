@@ -1,7 +1,6 @@
 
 const mongoose = require('mongoose');
 const Roteiro = require('../models/Roteiro');
-
 const categoriasPermitidas = [
   'politica',
   'economia',
@@ -80,8 +79,9 @@ async function criarRoteiro(req, res) {
 
 async function listarRoteiros(req, res) {
   try {
-    const roteiros = await Roteiro.find()
-      .sort({ createdAt: -1 });
+    const roteiros = await Roteiro.find({
+      status: { $ne: 'arquivado' }
+    }).sort({ createdAt: -1 });
 
     return res.status(200).json({
       mensagem: 'Roteiros encontrados com sucesso.',
@@ -252,9 +252,53 @@ async function atualizarRoteiro(req, res) {
   }
 }
 
+async function arquivarRoteiro(req, res) {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.isValidObjectId(id)) {
+      return res.status(400).json({
+        mensagem: 'ID do roteiro inválido.'
+      });
+    }
+
+    const roteiro = await Roteiro.findById(id);
+
+    if (!roteiro) {
+      return res.status(404).json({
+        mensagem: 'Roteiro não encontrado.'
+      });
+    }
+
+    if (roteiro.status === 'arquivado') {
+      return res.status(409).json({
+        mensagem: 'Este roteiro já está arquivado.'
+      });
+    }
+    roteiro.status = 'arquivado';
+
+    roteiro.atualizadoPor = req.usuario._id;
+
+    await roteiro.save();
+
+    return res.status(200).json({
+      mensagem: 'Roteiro arquivado com sucesso.',
+      roteiro
+    });
+
+  } catch (erro) {
+    console.error('Erro ao arquivar roteiro:', erro);
+
+    return res.status(500).json({
+      mensagem: 'Erro interno ao arquivar o roteiro.'
+    });
+  }
+}
+
 module.exports = {
   criarRoteiro,
   listarRoteiros,
   buscarRoteiroPorId,
-  atualizarRoteiro
+  atualizarRoteiro,
+  arquivarRoteiro
 };
