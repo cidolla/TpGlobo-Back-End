@@ -18,19 +18,27 @@ const options = {
       {
         url: 'http://localhost:3000',
         description: 'Servidor local de desenvolvimento'
+      },
+
+      ...(process.env.RENDER_EXTERNAL_URL
+        ? [
+          {
+            url: process.env.RENDER_EXTERNAL_URL,
+            description: 'Servidor de produção - Render'
+          }
+        ]
+        : [])
+    ],
+    tags: [
+      {
+        name: 'Autenticação',
+        description: 'Operações de autenticação e gerenciamento de acesso.'
+      },
+      {
+        name: 'Roteiros',
+        description: 'Gerenciamento dos roteiros do teleprompter.'
       }
     ],
-
-    tags: [
-  {
-    name: 'Autenticação',
-    description: 'Operações de autenticação e gerenciamento de acesso.'
-  },
-  {
-    name: 'Roteiros',
-    description: 'Gerenciamento dos roteiros do teleprompter.'
-  }
-],
 
     components: {
       securitySchemes: {
@@ -44,8 +52,8 @@ const options = {
   },
 
   apis: [
-  `${rotasDir}/*.js`
-]
+    `${rotasDir}/*.js`
+  ]
 };
 
 const swaggerSpec = swaggerJsdoc(options);
